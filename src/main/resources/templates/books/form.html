@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Kitaplar | Kütüphane</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --ink:#1a1a2e; --paper:#f5f0e8; --cream:#ede8dc; --accent:#c0392b; --gold:#b8860b; --muted:#7a7060; --white:#ffffff; --shadow:0 4px 24px rgba(26,26,46,.10); --radius:6px; }
+        body { font-family:'DM Sans',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; disp…
+        [11:03, 2/19/2026] Yüksel Mert Kırdar: !DOCTYPE html>
+        <html lang="tr" xmlns:th="http://www.thymeleaf.org">
+        <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title th:text="${book.id == null ? 'Yeni Kitap' : 'Kitap Düzenle'} + ' | Kütüphane'">Kitap | Kütüphane</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+        <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+            :root { --ink:#1a1a2e; --paper:#f5f0e8; --cream:#ede8dc; --accent:#c0392b; --muted:#7a7060; --white:#ffffff; --shadow:0 4px 24px rgba(26,26,46,.10); --radius:6px; }
+            body { font-family:'DM Sans',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; display:flex; flex-direction:column; }
+            nav { background:var(--ink); padding:0 2.5rem; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,.25); }
+            .nav-brand { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--paper); text-decoration:none; }
+            .nav-brand span { color:var(--accent); }
+            .nav-links { display:flex; gap:.25rem; }
+            .nav-links a { color:#ccc; text-decoration:none; font-size:.875rem; font-weight:500; padding:.45rem 1rem; border-radius:var(--radius); transition:background .18s,color .18s; }
+            .nav-links a:hover,.nav-links a.active { background:rgba(255,255,255,.1); color:var(--white); }
+            main { flex:1; max-width:1100px; width:100%; margin:0 auto; padding:2.5rem 2rem 4rem; }
+            .page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2rem; padding-bottom:1rem; border-bottom:2px solid var(--ink); }
+            .page-header h1 { font-family:'Playfair Display',serif; font-size:2rem; }
+            .page-header h1 small { display:block; font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:400; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; }
+            .btn { display:inline-flex; align-items:center; gap:6px; padding:.5rem 1.2rem; font-family:'DM Sans',sans-serif; font-size:.875rem; font-weight:500; border-radius:var(--radius); border:2px solid transparent; cursor:pointer; text-decoration:none; transition:all .18s; }
+            .btn-primary { background:var(--ink); color:var(--white); border-color:var(--ink); }
+            .btn-primary:hover { background:#2d2d4e; }
+            .btn-outline { background:transparent; color:var(--ink); border-color:var(--ink); }
+            .btn-outline:hover { background:var(--ink); color:var(--white); }
+            .form-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:2.5rem; max-width:560px; }
+            .form-group { margin-bottom:1.4rem; }
+            .form-group label { display:block; font-size:.78rem; font-weight:500; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:.45rem; }
+            .form-group input { width:100%; padding:.6rem .9rem; font-family:'DM Sans',sans-serif; font-size:.9rem; border:1.5px solid #d0cab8; border-radius:var(--radius); background:var(--paper); color:var(--ink); transition:border-color .18s; outline:none; }
+            .form-group input:focus { border-color:var(--ink); background:var(--white); }
+            .form-group input.is-invalid { border-color:var(--accent); }
+            .form-actions { display:flex; gap:.75rem; margin-top:1.8rem; }
+            .field-error { color:var(--accent); font-size:.78rem; margin-top:.3rem; }
+            .alert { padding:.85rem 1.2rem; border-radius:var(--radius); margin-bottom:1.5rem; font-size:.875rem; border-left:4px solid; }
+            .alert-error { background:#fdf0ef; border-color:var(--accent); color:#922b21; }
+            footer { text-align:center; padding:1.2rem; font-size:.78rem; color:var(--muted); border-top:1px solid var(--cream); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/"><span>■</span> Kütüphane</a>
+    <div class="nav-links">
+        <a href="/books" class="active">Kitaplar</a>
+        <a href="/members">Üyeler</a>
+        <a href="/borrowers">Ödünç İşlemleri</a>
+    </div>
+</nav>
+
+<main>
+    <div class="page-header">
+        <h1>
+            <small>Kitaplar</small>
+            <span th:text="${book.id == null ? 'Yeni Kitap Ekle' : 'Kitap Düzenle'}">Kitap</span>
+        </h1>
+        <a href="/books" class="btn btn-outline">← Geri</a>
+    </div>
+
+    <div class="form-card">
+        <!--
+            Yeni kitap: POST /books
+            Düzenleme : POST /books/{id} (PUT simülasyonu)
+        -->
+        <form th:action="${book.id == null ? '/books' : '/books/' + book.id}"
+              th:object="${book}"
+              method="post">
+
+            <!-- Güncelleme için method override -->
+            <input th:if="${book.id != null}" type="hidden" name="_method" value="PUT"/>
+
+            <div class="form-group">
+                <label for="title">Başlık *</label>
+                <input type="text" id="title" th:field="*{title}"
+                       th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
+                       placeholder="Kitap başlığını girin"/>
+                <div class="field-error" th:if="${#fields.hasErrors('title')}"
+                     th:errors="*{title}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="publisher">Yayınevi *</label>
+                <input type="text" id="publisher" th:field="*{publisher}"
+                       th:classappend="${#fields.hasErrors('publisher')} ? 'is-invalid'"
+                       placeholder="Yayınevi adını girin"/>
+                <div class="field-error" th:if="${#fields.hasErrors('publisher')}"
+                     th:errors="*{publisher}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="publishDate">Yayın Tarihi *</label>
+                <input type="date" id="publishDate" th:field="*{publishDate}"
+                       th:classappend="${#fields.hasErrors('publishDate')} ? 'is-invalid'"/>
+                <div class="field-error" th:if="${#fields.hasErrors('publishDate')}"
+                     th:errors="*{publishDate}"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"
+                        th:text="${book.id == null ? 'Kitap Ekle' : 'Güncelle'}">Kaydet</button>
+                <a href="/books" class="btn btn-outline">İptal</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer>© 2025 Kütüphane Yönetim Sistemi</footer>
+</body>
+</html>
