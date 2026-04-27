@@ -16,7 +16,7 @@ services:
     restart: always
 
   app:
-    image: yukselmert/librarymanagement:latest
+    image: alperry/devops:latest
     container_name: librarymanagement
     ports:
       - "8080:8080"
