@@ -49,5 +49,6 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
           script: |
-            docker pull alperry/devops:latest
-            docker compose -f /home/ec2-user/docker-compose.yml up -d
+            cd /home/ec2-user
+            docker-compose pull
+            docker-compose up -d
