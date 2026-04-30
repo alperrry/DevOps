@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ödünç İşlemleri | Kütüphane</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --ink:#1a1a2e; --paper:#f5f0e8; --cream:#ede8dc; --accent:#c0392b; --gold:#b8860b; --muted:#7a7060; --white:#ffffff; --shadow:0 4px 24px rgba(26,26,46,.10); --radius:6px; }
+        body { font-family:'DM Sans',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; display:flex; flex-direction:column; }
+        nav { background:var(--ink); padding:0 2.5rem; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,.25); }
+        .nav-brand { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--paper); text-decoration:none; }
+        .nav-brand span { color:var(--accent); }
+        .nav-links { display:flex; gap:.25rem; }
+        .nav-links a { color:#ccc; text-decoration:none; font-size:.875rem; font-weight:500; padding:.45rem 1rem; border-radius:var(--radius); transition:background .18s,color .18s; }
+        .nav-links a:hover,.nav-links a.active { background:rgba(255,255,255,.1); color:var(--white); }
+        main { flex:1; max-width:1200px; width:100%; margin:0 auto; padding:2.5rem 2rem 4rem; }
+        .page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2rem; padding-bottom:1rem; border-bottom:2px solid var(--ink); }
+        .page-header h1 { font-family:'Playfair Display',serif; font-size:2rem; }
+        .page-header h1 small { display:block; font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:400; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; }
+        .btn { display:inline-flex; align-items:center; gap:6px; padding:.5rem 1.2rem; font-family:'DM Sans',sans-serif; font-size:.875rem; font-weight:500; border-radius:var(--radius); border:2px solid transparent; cursor:pointer; text-decoration:none; transition:all .18s; }
+        .btn-primary { background:var(--ink); color:var(--white); border-color:var(--ink); }
+        .btn-primary:hover { background:#2d2d4e; }
+        .btn-gold { background:var(--gold); color:var(--white); border-color:var(--gold); }
+        .btn-gold:hover { background:#9a7009; }
+        .btn-sm { padding:.3rem .75rem; font-size:.8rem; }
+        .table-wrap { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+        table { width:100%; border-collapse:collapse; }
+        thead tr { background:var(--ink); }
+        thead th { color:var(--paper); font-size:.75rem; font-weight:500; text-transform:uppercase; letter-spacing:1px; padding:.85rem 1.2rem; text-align:left; }
+        tbody tr { border-bottom:1px solid var(--cream); transition:background .14s; }
+        tbody tr:last-child { border-bottom:none; }
+        tbody tr:hover { background:#faf8f3; }
+        tbody td { padding:.9rem 1.2rem; font-size:.9rem; vertical-align:middle; }
+        .actions { display:flex; gap:6px; }
+        .alert { padding:.85rem 1.2rem; border-radius:var(--radius); margin-bottom:1.5rem; font-size:.875rem; border-left:4px solid; }
+        .alert-error { background:#fdf0ef; border-color:var(--accent); color:#922b21; }
+        .alert-success { background:#eafaf1; border-color:#27ae60; color:#1e8449; }
+        .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+        .badge-returned { background:#eafaf1; color:#1e8449; }
+        .badge-overdue  { background:#fdf0ef; color:#922b21; }
+        .badge-active   { background:#eaf4fb; color:#1a5276; }
+        .empty { text-align:center; padding:3rem 1rem; color:var(--muted); }
+        .empty-icon { font-size:3rem; margin-bottom:.75rem; }
+        footer { text-align:center; padding:1.2rem; font-size:.78rem; color:var(--muted); border-top:1px solid var(--cream); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/"><span>■</span> Kütüphane</a>
+    <div class="nav-links">
+        <a href="/books">Kitaplar</a>
+        <a href="/members">Üyeler</a>
+        <a href="/borrowers" class="active">Ödünç İşlemleri</a>
+    </div>
+</nav>
+
+<main>
+    <div class="page-header">
+        <h1><small>Yönetim</small>Ödünç İşlemleri</h1>
+        <a href="/borrowers/new" class="btn btn-primary">+ Kitap Ödünç Ver</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}"   class="alert alert-error"   th:text="${errorMessage}"></div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Üye</th>
+                <th>Kitap</th>
+                <th>Veriliş Tarihi</th>
+                <th>Son İade Tarihi</th>
+                <th>İade Tarihi</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(borrowers)}">
+                <td colspan="8">
+                    <div class="empty">
+                        <div class="empty-icon">🔖</div>
+                        <p>Henüz hiç ödünç işlemi yapılmamış.</p>
+                    </div>
+                </td>
+            </tr>
+            <tr th:each="b : ${borrowers}">
+                <td style="color:#7a7060;font-size:.8rem;" th:text="${b.id}"></td>
+                <!-- Üye silinmişse "Silinmiş Üye" göster -->
+                <td style="font-weight:500;">
+                    <span th:if="${b.member != null}" th:text="${b.member.name}"></span>
+                    <span th:if="${b.member == null}" style="color:#7a7060;font-style:italic;">Silinmiş Üye</span>
+                </td>
+                <!-- Kitap silinmişse "Silinmiş Kitap" göster -->
+                <td>
+                    <span th:if="${b.book != null}" th:text="${b.book.title}"></span>
+                    <span th:if="${b.book == null}" style="color:#7a7060;font-style:italic;">Silinmiş Kitap</span>
+                </td>
+                <td th:text="${#temporals.format(b.issueDate,'dd.MM.yyyy')}"></td>
+                <td th:text="${#temporals.format(b.dueDate,'dd.MM.yyyy')}"></td>
+                <td>
+                        <span th:if="${b.returnDate != null}"
+                              th:text="${#temporals.format(b.returnDate,'dd.MM.yyyy')}"></span>
+                    <span th:if="${b.returnDate == null}" style="color:#7a7060;">—</span>
+                </td>
+                <td>
+                    <!-- İade edilmiş -->
+                    <span th:if="${b.returnDate != null}"
+                          class="badge badge-returned">İade Edildi</span>
+                    <!-- Gecikmiş (iade yok + dueDate geçmiş) -->
+                    <span th:if="${b.returnDate == null and b.dueDate.isBefore(#temporals.createToday())}"
+                          class="badge badge-overdue">Gecikmiş</span>
+                    <!-- Aktif -->
+                    <span th:if="${b.returnDate == null and !b.dueDate.isBefore(#temporals.createToday())}"
+                          class="badge badge-active">Aktif</span>
+                </td>
+                <td>
+                    <!-- Sadece iade edilmemiş kayıtlarda "İade Al" butonu göster -->
+                    <form th:if="${b.returnDate == null}"
+                          th:action="@{/borrowers/{id}/return(id=${b.id})}"
+                          method="post"
+                          onsubmit="return confirm('Kitabı iade almak istediğinize emin misiniz?')">
+                        <button type="submit" class="btn btn-gold btn-sm">İade Al</button>
+                    </form>
+                    <span th:if="${b.returnDate != null}" style="color:#7a7060;font-size:.8rem;">—</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>© 2025 Kütüphane Yönetim Sistemi</footer>
+</body>
+</html>
